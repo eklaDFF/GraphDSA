@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 public class Main {
@@ -69,6 +70,33 @@ public class Main {
 
         Bellman_Ford(A2,E2,edgeArrayList2);
 
+
+        System.out.println("--------------------------Prims Spanning Tree--------------------- Example below");
+
+        Vertex A3 = new Vertex('A');
+        Vertex B3 = new Vertex('B');
+        Vertex C3 = new Vertex('C');
+        Vertex D3 = new Vertex('D');
+        Vertex E3 = new Vertex('E');
+
+        EdgeArrayList edgeArrayList3 = new EdgeArrayList();
+        edgeArrayList3.addEdge(A3,B3,5);
+        edgeArrayList3.addEdge(B3,A3,5);
+        edgeArrayList3.addEdge(A3,C3,-1);
+        edgeArrayList3.addEdge(C3,A3,-1);
+        edgeArrayList3.addEdge(B3,C3,-2);
+        edgeArrayList3.addEdge(C3,B3,-2);
+        edgeArrayList3.addEdge(B3,D3,-3);
+        edgeArrayList3.addEdge(D3,B3,-3);
+        edgeArrayList3.addEdge(C3,D3,6);
+        edgeArrayList3.addEdge(D3,C3,6);
+        edgeArrayList3.addEdge(C3,E3,3);
+        edgeArrayList3.addEdge(E3,C3,3);
+        edgeArrayList3.addEdge(D3,E3,2);
+        edgeArrayList3.addEdge(E3,D3,2);
+
+        SpanningTreeByPrims(A3,5,edgeArrayList3);
+
     }
     public static void DijkstraAlgo(Vertex source,Vertex destination,EdgeArrayList edgeArrayList){
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(o -> o.pathDistanceFromSourceVertex));
@@ -137,5 +165,48 @@ public class Main {
         }
         path.append(c.name);
         System.out.println(path);
+    }
+
+    public static void SpanningTreeByPrims(Vertex root,int vertices, EdgeArrayList edgeArrayList){
+        PriorityQueue<EdgeArrayList.EdgeArrayListNode> priorityQueue = new PriorityQueue<>(new Comparator<EdgeArrayList.EdgeArrayListNode>(){
+
+            @Override
+            public int compare(EdgeArrayList.EdgeArrayListNode o1, EdgeArrayList.EdgeArrayListNode o2) {
+                return o1.weight-o2.weight;
+            }
+        });
+
+        // Spanning Tree Edges
+        ArrayList<EdgeArrayList.EdgeArrayListNode> spanningTreeEdges = new ArrayList<>();
+
+        priorityQueue.addAll(getPathsFrom(root,edgeArrayList));
+        root.explored = true;
+        int vertexExplored = 1;
+        while (vertexExplored < vertices){  // As the vertexExplored becomes vertexExplored==vertices, exploration will be stopped
+            EdgeArrayList.EdgeArrayListNode c = priorityQueue.remove();
+            Vertex edgeEndVertex = c.b;
+            if (!edgeEndVertex.explored){
+                priorityQueue.addAll(getPathsFrom(edgeEndVertex,edgeArrayList));
+                edgeEndVertex.explored = true;
+                vertexExplored++;
+
+                // Adding Edge and building spanning tree
+                spanningTreeEdges.add(c);
+            }
+        }
+
+        // Printing Spanning Tree
+        for (EdgeArrayList.EdgeArrayListNode edge : spanningTreeEdges){
+            System.out.println(edge.a.name + ", " + edge.b.name + ", " + edge.weight);
+        }
+    }
+    public static ArrayList<EdgeArrayList.EdgeArrayListNode> getPathsFrom(Vertex root, EdgeArrayList edgeArrayList){
+        ArrayList<EdgeArrayList.EdgeArrayListNode> list = new ArrayList<>();
+        for (EdgeArrayList.EdgeArrayListNode edge : edgeArrayList.edgeArrayList){
+            if (edge.a.equals(root)){
+                list.add(edge);
+            }
+        }
+        return list;
     }
 }
