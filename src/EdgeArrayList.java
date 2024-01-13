@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 public class EdgeArrayList {
-    private class EdgeArrayListNode {
+    class EdgeArrayListNode {
         Vertex a,b;
         int weight;
         public EdgeArrayListNode(Vertex a,Vertex b,int weight){

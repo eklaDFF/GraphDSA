@@ -24,6 +24,51 @@ public class Main {
         edgeArrayList.addEdge(D,E,4);
 
         DijkstraAlgo(A,E,edgeArrayList);
+
+        System.out.println("--------------------------Bellman--------------------- Example 1 below");
+
+        Vertex A1 = new Vertex('0');
+        Vertex B1 = new Vertex('1');
+        Vertex C1 = new Vertex('2');
+
+        A1.adjacentVertices.add(B1);
+        B1.adjacentVertices.add(C1);
+        C1.adjacentVertices.add(A1);
+
+        EdgeArrayList edgeArrayList1 = new EdgeArrayList();
+        edgeArrayList1.addEdge(A1,B1,2);
+        edgeArrayList1.addEdge(B1,C1,1);
+        edgeArrayList1.addEdge(C1,A1,-4);
+
+        Bellman_Ford(A1,C1,edgeArrayList1);
+
+
+        System.out.println("--------------------------Bellman--------------------- Example 2 below");
+        Vertex A2 = new Vertex('1');
+        Vertex B2 = new Vertex('2');
+        Vertex C2 = new Vertex('3');
+        Vertex D2 = new Vertex('4');
+        Vertex E2 = new Vertex('5');
+
+        A2.adjacentVertices.add(B2);
+        A2.adjacentVertices.add(C2);
+        B2.adjacentVertices.add(D2);
+        C2.adjacentVertices.add(B2);
+        C2.adjacentVertices.add(D2);
+        C2.adjacentVertices.add(E2);
+        D2.adjacentVertices.add(E2);
+
+        EdgeArrayList edgeArrayList2 = new EdgeArrayList();
+        edgeArrayList2.addEdge(A2,B2,5);
+        edgeArrayList2.addEdge(A2,C2,-1);
+        edgeArrayList2.addEdge(B2,D2,-3);
+        edgeArrayList2.addEdge(C2,B2,-2);
+        edgeArrayList2.addEdge(C2,D2,6);
+        edgeArrayList2.addEdge(D2,E2,2);
+        edgeArrayList2.addEdge(C2,E2,3);
+
+        Bellman_Ford(A2,E2,edgeArrayList2);
+
     }
     public static void DijkstraAlgo(Vertex source,Vertex destination,EdgeArrayList edgeArrayList){
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(o -> o.pathDistanceFromSourceVertex));
@@ -49,6 +94,44 @@ public class Main {
         StringBuilder path = new StringBuilder(c.name + "(Cost to reach here " + destination.pathDistanceFromSourceVertex +") <- ");
         c = c.pathAdjacentSourceVertex;
         while (c.name != source.name){
+            path.append(c.name).append(" <- ");
+            c = c.pathAdjacentSourceVertex;
+        }
+        path.append(c.name);
+        System.out.println(path);
+    }
+
+    public static void Bellman_Ford(Vertex source,Vertex destination,EdgeArrayList edgeArrayList){
+        source.pathDistanceFromSourceVertex = 0;
+        source.pathAdjacentSourceVertex = source;
+
+        // Relaxing all the edges for (v-1)times. v is no of vertices
+        for (int i=1;i<edgeArrayList.edgeArrayList.size();i++){
+            for (var edge : edgeArrayList.edgeArrayList){
+                Vertex s = edge.a;
+                Vertex d = edge.b;
+                if (d.pathDistanceFromSourceVertex > (s.pathDistanceFromSourceVertex + edge.weight)){
+                    d.pathDistanceFromSourceVertex = (s.pathDistanceFromSourceVertex + edge.weight);
+                    d.pathAdjacentSourceVertex = s;
+                }
+            }
+        }
+
+        // Relaxing one for time to check whether the graph contains -ve cycle
+        for (var edge : edgeArrayList.edgeArrayList){
+            Vertex s = edge.a;
+            Vertex d = edge.b;
+            if (d.pathDistanceFromSourceVertex > (s.pathDistanceFromSourceVertex + edge.weight)){
+                System.out.println("This graph contains -ve cycle");
+                return;
+            }
+        }
+
+        // If the graph passes -ve cycle check
+        Vertex c = destination;
+        StringBuilder path = new StringBuilder(c.name + "(Cost to reach here " + c.pathDistanceFromSourceVertex + ") <- ");
+        c = c.pathAdjacentSourceVertex;
+        while (c!=source){
             path.append(c.name).append(" <- ");
             c = c.pathAdjacentSourceVertex;
         }
